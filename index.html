@@ -1,0 +1,71 @@
+<! DOCTYPE html>
+<html>
+    <head>
+        <title>Colors</title>
+    </head>
+    <body>
+        <script>
+            // Actions
+            function addColor(value) {
+                return {
+                    type: "ADD",
+                    color: value
+                };
+            }
+            function removeColor(value) {
+                return {
+                    type: "REMOVE",
+                    color: value
+                };
+            }
+
+            // Reducer
+            function favoriteColors(state, action) {
+                if (state === undefined) {
+                    state = [];
+                }
+                if (action.type === "ADD") {
+                    return state.concat(action.color);
+                }
+                else if (action.type === "REMOVE") {
+                    return state.filter(function(item) {
+                        return item!== action.color;
+                    });
+                } else {
+                    return state;
+                }
+            }
+
+            // Store
+            function createStore(reducer) {
+                let state = reducer(undefined, {type: '__INIT'})
+                let subscribers = []
+                return {
+                    getState: () => state,
+                    dispatch: action => {
+                        state = reducer(state, action)
+                        subscribers.forEach((callback) => callback())
+                    },
+                    subscribe: (callback) => {
+                        subscribers.push(callback)
+                    },
+                }
+            }
+            function render() {
+                console.log(store.getState());
+            }
+
+            const store = createStore(favoriteColors);
+            store.subscribe(render);
+
+            store.dispatch(addColor("blue"));
+            store.dispatch(addColor("yellow"));
+            store.dispatch(addColor("green"));
+            store.dispatch(addColor("red"));
+            store.dispatch(addColor("gray"));
+            store.dispatch(addColor("orange"));
+            store.dispatch(removeColor("gray"));
+
+        </script>
+    </body>
+</html>
